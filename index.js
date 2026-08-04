@@ -1,4 +1,4 @@
-require('http').createServer((req,res) => res.end('Bot Lunna funcionando')).listen(process.env.PORT || 3000);
+require('http').createServer((req,res) => res.end('Lunna OK')).listen(process.env.PORT || 3000);
 require('dotenv').config();
 const TelegramBotModule = require('node-telegram-bot-api');
 const TelegramBot = TelegramBotModule.default || TelegramBotModule;

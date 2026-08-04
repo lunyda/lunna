@@ -1,37 +1,37 @@
-require('http').createServer((req,res) => res.end('Lunna OK')).listen(process.env.PORT || 3000);
-require('dotenv').config();
-const TelegramBotModule = require('node-telegram-bot-api');
-const TelegramBot = TelegramBotModule.default || TelegramBotModule;
-const fs = require('fs');
-const bot = new TelegramBot(process.env.TELEGRAM_TOKEN, { polling: true });
-let tareas = [];
-if (fs.existsSync('tareas.json')) {
-  tareas = JSON.parse(fs.readFileSync('tareas.json'));
-}
-function guardar() {
-  fs.writeFileSync('tareas.json', JSON.stringify(tareas, null, 2));
-}
-bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, `Hola Luna! Soy tu bot 🌙\n/tarea comprar pan\n/hoy\n/dinero\n/borrar`);
-});
-bot.onText(/\/tarea (.+)/, (msg, match) => {
-  tareas.push({ texto: match[1], fecha: new Date().toLocaleDateString() });
-  guardar();
-  bot.sendMessage(msg.chat.id, `Guardado: "${match[1]}" ✅`);
-});
-bot.onText(/\/hoy/, (msg) => {
-  if (tareas.length === 0) bot.sendMessage(msg.chat.id, "No tienes tareas 🎉");
-  else {
-    let lista = "Tus tareas:\n";
-    tareas.forEach((t, i) => lista += `${i+1}. ${t.texto}\n`);
-    bot.sendMessage(msg.chat.id, lista);
+const TelegramBot = require('node-telegram-bot-api');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+
+const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+console.log("Lunna con cerebro de Gemini lista...");
+
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text;
+  
+  if (!text) return;
+
+  // Para no responder a comandos
+  if (text.startsWith('/')) {
+     if (text === '/start') {
+        bot.sendMessage(chatId, "¡Hola! Soy Lunna 🌙✨ Ya puedo investigar, resumir y ayudarte como ChatGPT. ¿Qué quieres saber?");
+     }
+     return;
+  }
+
+  bot.sendChatAction(chatId, 'typing');
+
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Eres Lunna, una asistente muy amable, divertida y útil. Responde corto, claro y en español. Pregunta del usuario: ${text}`;
+    
+    const result = await model.generateContent(prompt);
+    const response = result.response.text();
+    
+    bot.sendMessage(chatId, response);
+  } catch (error) {
+    console.log(error);
+    bot.sendMessage(chatId, "Ay, me trabé un segundo 🥺 inténtalo de nuevo.");
   }
 });
-bot.onText(/\/dinero/, (msg) => {
-  bot.sendMessage(msg.chat.id, `Con $27,500:\n- $11,000 -> GBM (VOO)\n- $3,000 -> CETES\n- $13,500 -> vivir\nMándalo HOY`);
-});
-bot.onText(/\/borrar/, (msg) => {
-  tareas = []; guardar();
-  bot.sendMessage(msg.chat.id, "Borradas 🗑️");
-});
-console.log("Bot encendido...");

@@ -1,14 +1,14 @@
 {
-  "name": "mi-bot",
+  "name": "lunna",
   "version": "1.0.0",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js"
   },
   "dependencies": {
-    "dotenv": "^17.4.2",
-    "node-telegram-bot-api": "^1.2.0"
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.5",
+    "node-telegram-bot-api": "^0.64.0"
   }
 }

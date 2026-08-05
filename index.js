@@ -14,8 +14,10 @@ bot.on('text', async (ctx) => {
     const result = await model.generateContent(ctx.message.text);
     await ctx.reply(result.response.text());
   } catch (e) {
-    console.error(e);
-    ctx.reply('Se me trabó tantito 🥺');
+    } catch (error) {
+  console.error(error);
+  ctx.reply("Error real: " + error.message)
+}
   }
 });
 

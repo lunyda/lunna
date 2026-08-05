@@ -1,42 +1,23 @@
-const http = require('http');
-http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end('Lunna viva');
-}).listen(process.env.PORT || 10000, () => console.log('Puerto listo'));
-
-const TelegramBot = require('node-telegram-bot-api');
+const { Telegraf } = require('telegraf');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
+const bot = new Telegraf(process.env.BOT_TOKEN);
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-console.log("Lunna con cerebro de Gemini lista...");
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-bot.on('message', async (msg) => {
-  const chatId = msg.chat.id;
-  const text = msg.text;
-  
-  if (!text) return;
-
-  // Para no responder a comandos
-  if (text.startsWith('/')) {
-     if (text === '/start') {
-        bot.sendMessage(chatId, "¡Hola! Soy Lunna 🌙✨ Ya puedo investigar, resumir y ayudarte como ChatGPT. ¿Qué quieres saber?");
-     }
-     return;
-  }
-
-  bot.sendChatAction(chatId, 'typing');
-
+bot.on('text', async (ctx) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-    const prompt = `Eres Lunna, una asistente muy amable, divertida y útil. Responde corto, claro y en español. Pregunta del usuario: ${text}`;
+    const prompt = ctx.message.text;
+    await ctx.sendChatAction('typing');
     const result = await model.generateContent(prompt);
     const response = result.response.text();
-    
-    bot.sendMessage(chatId, response);
-  } catch (error) {
-    console.log(error);
-    bot.sendMessage(chatId, "Ay, me trabé un segundo 🥺 inténtalo de nuevo.");
+    await ctx.reply(response);
+  } catch (e) {
+    console.log(e);
+    await ctx.reply('Se me trabó tantito, intenta de nuevo');
   }
 });
+
+bot.launch();
+console.log('Lunna con cerebro 2.0 lista 🧠');

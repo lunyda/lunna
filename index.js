@@ -23,7 +23,7 @@ bot.on('message', async (msg) => {
   bot.sendChatAction(chatId, 'typing');
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const prompt = `Eres Lunna, una asistente muy amable, divertida y útil. Responde corto, claro y en español. Pregunta del usuario: ${text}`;
     const result = await model.generateContent(prompt);
     const response = result.response.text();

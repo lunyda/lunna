@@ -1,35 +1,13 @@
-require('dotenv').config();
-const { Telegraf } = require('telegraf');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-const bot = new Telegraf(process.env.BOT_TOKEN);
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-bot.start((ctx) => ctx.reply('¡Hola! Soy Lunna con cerebro 2.0 🧠💖 lista'));
-
-bot.on('text', async (ctx) => {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent(ctx.message.text);
-    await ctx.reply(result.response.text());
-  } catch (e) {
-    console.error(e);
-    ctx.reply('Se me trabó tantito el cerebro, intenta de nuevo 🥺');
+{
+  "name": "lunna-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "dotenv": "^16.4.5",
+    "telegraf": "^4.15.3"
   }
-});
-
-// Esto evita que se caiga el deploy si hay conflicto de getUpdates
-bot.catch((err) => {
-  console.error('Error de Telegraf:', err);
-});
-
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
-
-bot.launch().then(() => {
-  console.log('Lunna con cerebro 2.0 lista 🧠');
-}).catch(err => {
-  console.error('No pude lanzar Lunna:', err);
-});
-
-console.log('Iniciando Lunna...');
+}

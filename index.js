@@ -10,7 +10,7 @@ bot.start((ctx) => ctx.reply('¡Hola! Soy Lunna con cerebro 2.0 🧠💖'));
 
 bot.on('text', async (ctx) => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const result = await model.generateContent(ctx.message.text);
     await ctx.reply(result.response.text());
   } catch (error) {
